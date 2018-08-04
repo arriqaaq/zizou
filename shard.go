@@ -68,6 +68,7 @@ func newXXHash() hasher {
 	return xxHash{}
 }
 
+// https://cyan4973.github.io/xxHash/
 type xxHash struct {
 }
 

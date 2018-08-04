@@ -9,10 +9,11 @@ import (
 )
 
 const (
-	NoExpiration  time.Duration = 0
-	DEvictionTime               = 1 * time.Second
-	DefaultKey                  = "w4erf3w4ref43t24rwgthg43t2r3fg"
-	DefaultVal                  = `3w43eryduh23orregfw4r34f3rfwq34e53`
+	DefaultKey = "w4erf3w4ref43t24rwgthg43t2r3fg"
+	DefaultVal = `3w43eryduh23orregfw4r34f3rfwq34e53`
+
+	NoExpiration   time.Duration = 0
+	DTevictionTime time.Duration = 100 * time.Millisecond
 )
 
 func intToStr(i int) string {
@@ -105,7 +106,7 @@ func BenchmarkCacheGetNotExpiring(b *testing.B) {
 
 func benchmarkCacheGet(b *testing.B, exp time.Duration) {
 	b.StopTimer()
-	tc := New(NoExpiration)
+	tc := New(DTevictionTime)
 	tc.Set("foo", DefaultVal, exp)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -123,7 +124,7 @@ func BenchmarkCacheGetConcurrentNotExpiring(b *testing.B) {
 
 func benchmarkCacheGetConcurrent(b *testing.B, exp time.Duration) {
 	b.StopTimer()
-	tc := New(NoExpiration)
+	tc := New(DTevictionTime)
 	tc.Set("foo", DefaultVal, exp)
 	wg := new(sync.WaitGroup)
 	workers := runtime.NumCPU()
@@ -151,7 +152,7 @@ func BenchmarkCacheSetNotExpiring(b *testing.B) {
 
 func benchmarkCacheSet(b *testing.B, exp time.Duration) {
 	b.StopTimer()
-	tc := New(DEvictionTime)
+	tc := New(DTevictionTime)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		tc.Set("foo", DefaultVal, exp)
@@ -160,7 +161,7 @@ func benchmarkCacheSet(b *testing.B, exp time.Duration) {
 
 func BenchmarkCacheSetDelete(b *testing.B) {
 	b.StopTimer()
-	tc := New(NoExpiration)
+	tc := New(DTevictionTime)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		tc.Set("foo", DefaultVal, NoExpiration)
@@ -170,7 +171,7 @@ func BenchmarkCacheSetDelete(b *testing.B) {
 
 func BenchmarkCacheFlush(b *testing.B) {
 	b.StopTimer()
-	tc := New(NoExpiration)
+	tc := New(DTevictionTime)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		tc.Set("foo", DefaultVal, NoExpiration)
@@ -180,7 +181,7 @@ func BenchmarkCacheFlush(b *testing.B) {
 
 func BenchmarkCacheMultipleSetFlush(b *testing.B) {
 	b.StopTimer()
-	tc := New(NoExpiration)
+	tc := New(DTevictionTime)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		tc.Set(intToStr(i), DefaultVal, NoExpiration)
