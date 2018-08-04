@@ -169,18 +169,6 @@ func BenchmarkCacheSetDelete(b *testing.B) {
 	}
 }
 
-func BenchmarkCacheSetDeleteSingleLock(b *testing.B) {
-	b.StopTimer()
-	tc := New(NoExpiration)
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		tc.mu.Lock()
-		tc.set("foo", DefaultVal, NoExpiration)
-		tc.delete("foo")
-		tc.mu.Unlock()
-	}
-}
-
 func BenchmarkCacheFlush(b *testing.B) {
 	b.StopTimer()
 	tc := New(NoExpiration)
