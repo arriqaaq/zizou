@@ -12,8 +12,7 @@ const (
 	NoExpiration  time.Duration = 0
 	DEvictionTime               = 1 * time.Second
 	DefaultKey                  = "w4erf3w4ref43t24rwgthg43t2r3fg"
-	DefaultVal                  = `curl -XPOST http://130.211.114.240:8000/alexander/token -d'{"debug": true,"game_id": "00000100","user": {"advid": "string","ai5": "testai5","ua": "string","ip": "106.51.65.205","optout": 0,"consent": 0},"app": {"ver": "string","num": 0,"bundle": "string","engine": "string"},"sdk": {"num": 0,"ver": "8.8.3","mock-admob": {"ver": "1.0"},"units": {"float": ["float-0103","float-0104"],"native": ["unit-0101","unit-0102","unit-0102"]}},"device": {"os": {"pltfrm": "string","ver": "string","num": "0","apilvl": 0},"maker": "string","model": "string","scrn": {"h": 0,"w": 0,"d": 0,"di": 0},"locale": "string"},"carrier": {"name": "string","ct": 0,"cr": "string","hni": 0}}'
-{"token":"96a94af5-60e5-4ccc-76af-2c98132b1dd0","next":{"partners":[{"name":"mock-admob","prio":21,"ecpm":0.05,"cmp_id":"7001","conf":{"app_id":"ca-app-pub-4073866383873410~7558583524","plcmnt_id":"ca-app-pub-3940256099942544/2247696110"}}]}}`
+	DefaultVal                  = `3w43eryduh23orregfw4r34f3rfwq34e53`
 )
 
 func intToStr(i int) string {
