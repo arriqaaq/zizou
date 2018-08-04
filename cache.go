@@ -117,11 +117,21 @@ func (c *cache) get(k string) (item, bool) {
 	return item, found
 }
 
+/*
+	If key has expired on a get, it's deleted in the same call
+*/
 func (c *cache) Get(k string) (interface{}, bool) {
 	c.mu.RLock()
 	val, found := c.get(k)
 	c.mu.RUnlock()
 	if found {
+		now := time.Now().UnixNano()
+		if val.expireAt > 0 && now > val.expireAt {
+			c.mu.Lock()
+			c.delete(k)
+			c.mu.Unlock()
+			return nil, false
+		}
 		return val.value, true
 	}
 	return nil, false
@@ -156,11 +166,19 @@ func (c *cache) Delete(k string) bool {
 // sharded ring buffers
 func (c *cache) Evict() {
 	now := time.Now().UnixNano()
-	c.mu.Lock()
+	delKeys := make([]string, 0, 1000)
+	c.mu.RLock()
 	for key, val := range c.data {
 		if val.expireAt > 0 && now > val.expireAt {
-			c.delete(key)
+			delKeys = append(delKeys, key)
 		}
+	}
+	c.mu.RUnlock()
+
+	// Could be made into a diff go routine in future
+	c.mu.Lock()
+	for _, key := range delKeys {
+		c.delete(key)
 	}
 	c.mu.Unlock()
 }
