@@ -13,7 +13,7 @@ const (
 	DefaultVal = `3w43eryduh23orregfw4r34f3rfwq34e53`
 
 	NoExpiration   time.Duration = 0
-	DTevictionTime time.Duration = 100 * time.Millisecond
+	DTevictionTime time.Duration = 1000 * time.Millisecond
 )
 
 func intToStr(i int) string {
