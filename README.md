@@ -11,14 +11,15 @@ In memory cache implementation with high concurrency
 
 ## Performance
 
-BenchmarkCacheGetExpiring-4                	20000000	        70.0 ns/op
-BenchmarkCacheGetNotExpiring-4             	20000000	       119 ns/op
-BenchmarkCacheGetConcurrentExpiring-4      	20000000	        59.3 ns/op
-BenchmarkCacheGetConcurrentNotExpiring-4   	20000000	        91.3 ns/op
-BenchmarkCacheSetExpiring-4                	10000000	       172 ns/op
-BenchmarkCacheSetNotExpiring-4             	10000000	       134 ns/op
-BenchmarkCacheSetDelete-4                  	 5000000	       343 ns/op
-
+```bash
+		BenchmarkCacheGetExpiring-4                	20000000	        70.0 ns/op
+		BenchmarkCacheGetNotExpiring-4             	20000000	       119 ns/op
+		BenchmarkCacheGetConcurrentExpiring-4      	20000000	        59.3 ns/op
+		BenchmarkCacheGetConcurrentNotExpiring-4   	20000000	        91.3 ns/op
+		BenchmarkCacheSetExpiring-4                	10000000	       172 ns/op
+		BenchmarkCacheSetNotExpiring-4             	10000000	       134 ns/op
+		BenchmarkCacheSetDelete-4                  	 5000000	       343 ns/op
+```
 ## Example Usage
 
 ```go
