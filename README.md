@@ -4,7 +4,7 @@ In memory cache implementation with high concurrency
 
 ## Features
 
-* Store hundreds of millions of entries
+* Store millions of entries
 * High concurrent thread-safe access
 * Expiration support
 * Shard support to avoid locks on whole db during any concurrent read/writes/deletes
