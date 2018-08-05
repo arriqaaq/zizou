@@ -13,6 +13,16 @@ In memory cache implementation with high concurrency
 * Expiration support
 * Shard support to avoid locks on whole db during any concurrent read/writes/deletes
 
+## Example Usage
+
+```go
+cache:=zizou.New(10*time.Minute)
+cache.Set("foo", "bar", 10*time.Second)
+item, found := cache.Get("foo")
+```
+
+
+
 ## Performance
 
 ```bash
@@ -24,14 +34,6 @@ In memory cache implementation with high concurrency
 		BenchmarkCacheSetNotExpiring-4             	10000000	       134 ns/op
 		BenchmarkCacheSetDelete-4                  	 5000000	       343 ns/op
 ```
-## Example Usage
-
-```go
-cache:=zizou.New(10*time.Minute)
-cache.Set("foo", "bar", 10*time.Second)
-item, found := cache.Get("foo")
-```
-
 
 
 ## TODO
@@ -42,3 +44,4 @@ item, found := cache.Get("foo")
 - Implement operations using cmdable interface as done in go-redis(design pattern)
 - Check how GC can be avoided 
 
+Zizou Image source: https://www.pinterest.ca/pin/436075176391410672/?lp=true

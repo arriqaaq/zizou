@@ -8,7 +8,7 @@ func New(sweepTime time.Duration) *Cache {
 	nc := &Cache{
 		shards:    make([]*shard, 256),
 		hash:      newXXHash(),
-		maxShards: 255,
+		shardMask: 255,
 	}
 	for i := uint64(0); i < 256; i++ {
 		nc.shards[i] = newShardWithSweeper(sweepTime)
@@ -19,11 +19,11 @@ func New(sweepTime time.Duration) *Cache {
 type Cache struct {
 	shards    []*shard
 	hash      hasher
-	maxShards uint64
+	shardMask uint64
 }
 
 func (c *Cache) getShard(hashedKey uint64) (shard *shard) {
-	return c.shards[hashedKey&c.maxShards]
+	return c.shards[hashedKey&c.shardMask]
 }
 
 func (c *Cache) Get(k string) (interface{}, bool) {
