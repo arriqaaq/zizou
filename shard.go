@@ -177,8 +177,7 @@ func (c *shard) Delete(k string) bool {
 }
 
 // This is going to be painfully slow as the rwlock will be on the entire map
-// during the period of evicting expired keys. Will be resolved in future using
-// sharded ring buffers
+// during the period of evicting expired keys.
 func (c *shard) Evict() {
 	now := time.Now().UnixNano()
 	delKeys := make([]string, 0, 1000)
