@@ -61,7 +61,7 @@ func TestCache(t *testing.T) {
 func TestCacheTimes(t *testing.T) {
 	var found bool
 
-	tc := New(10 * time.Millisecond)
+	tc := New(0 * time.Millisecond)
 	tc.Set("a", 1, 2*time.Millisecond)
 	tc.Set("b", 2, NoExpiration)
 	tc.Set("c", 3, 20*time.Millisecond)

@@ -2,6 +2,7 @@ package zizou
 
 import (
 	hash1 "github.com/cespare/xxhash"
+	"math/rand"
 	"runtime"
 	"sync"
 	"time"
@@ -9,7 +10,20 @@ import (
 
 const (
 	DefaultEvictionTime = 600 * time.Second
+	MinimumStartupTime  = 300 * time.Millisecond
+	MaximumStartupTime  = 2 * MinimumStartupTime
 )
+
+// Used to put a random delay before start of each shard, so as to not
+// let various shards lock at the same time
+func startupDelay() time.Duration {
+	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
+	d, delta := MinimumStartupTime, (MaximumStartupTime - MinimumStartupTime)
+	if delta > 0 {
+		d += time.Duration(rand.Int63n(int64(delta)))
+	}
+	return d
+}
 
 type evictor interface {
 	Run(*shard)
@@ -29,6 +43,7 @@ type sweeper struct {
 }
 
 func (s *sweeper) Run(c *shard) {
+	<-time.After(startupDelay())
 	ticker := time.NewTicker(s.interval)
 	for {
 		select {
