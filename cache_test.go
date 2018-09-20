@@ -1,6 +1,7 @@
 package zizou
 
 import (
+	"fmt"
 	"runtime"
 	"strconv"
 	"sync"
@@ -16,12 +17,41 @@ const (
 	DTevictionTime time.Duration = 1000 * time.Millisecond
 )
 
+func timeGC() time.Duration {
+	start := time.Now()
+	runtime.GC()
+	return time.Since(start)
+}
+
+func PrintMemUsage() {
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
+	fmt.Printf("Alloc = %v MiB", bToMb(m.Alloc))
+	fmt.Printf("\tTotalAlloc = %v MiB", bToMb(m.TotalAlloc))
+	fmt.Printf("\tSys = %v MiB", bToMb(m.Sys))
+	fmt.Printf("\tNumGC = %v\n", m.NumGC)
+	fmt.Println()
+}
+
+func bToMb(b uint64) uint64 {
+	return b / 1024 / 1024
+}
+
 func intToStr(i int) string {
 	return strconv.Itoa(i)
 }
 
 func TestCache(t *testing.T) {
-	tc := New(0)
+	cnf := &Config{
+		SweepTime: 0,
+		ShardSize: 256,
+	}
+	tc, err := New(cnf)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 
 	tc.Set("a", 1, NoExpiration)
 	tc.Set("b", "b", NoExpiration)
@@ -61,7 +91,16 @@ func TestCache(t *testing.T) {
 func TestCacheTimes(t *testing.T) {
 	var found bool
 
-	tc := New(0 * time.Millisecond)
+	cnf := &Config{
+		SweepTime: 0,
+		ShardSize: 256,
+	}
+	tc, err := New(cnf)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
 	tc.Set("a", 1, 2*time.Millisecond)
 	tc.Set("b", 2, NoExpiration)
 	tc.Set("c", 3, 20*time.Millisecond)
@@ -106,7 +145,16 @@ func BenchmarkCacheGetNotExpiring(b *testing.B) {
 
 func benchmarkCacheGet(b *testing.B, exp time.Duration) {
 	b.StopTimer()
-	tc := New(DTevictionTime)
+	cnf := &Config{
+		SweepTime: DTevictionTime,
+		ShardSize: 256,
+	}
+	tc, err := New(cnf)
+	if err != nil {
+		b.Error(err)
+		return
+	}
+
 	tc.Set("foo", DefaultVal, exp)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -124,7 +172,16 @@ func BenchmarkCacheGetConcurrentNotExpiring(b *testing.B) {
 
 func benchmarkCacheGetConcurrent(b *testing.B, exp time.Duration) {
 	b.StopTimer()
-	tc := New(DTevictionTime)
+	cnf := &Config{
+		SweepTime: DTevictionTime,
+		ShardSize: 256,
+	}
+	tc, err := New(cnf)
+	if err != nil {
+		b.Error(err)
+		return
+	}
+
 	tc.Set("foo", DefaultVal, exp)
 	wg := new(sync.WaitGroup)
 	workers := runtime.NumCPU()
@@ -152,16 +209,38 @@ func BenchmarkCacheSetNotExpiring(b *testing.B) {
 
 func benchmarkCacheSet(b *testing.B, exp time.Duration) {
 	b.StopTimer()
-	tc := New(DTevictionTime)
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		tc.Set("foo", DefaultVal, exp)
+	cnf := &Config{
+		SweepTime: exp,
+		ShardSize: 256,
 	}
+	tc, err := New(cnf)
+	if err != nil {
+		b.Error(err)
+		return
+	}
+
+	b.StartTimer()
+	fmt.Println("len: ", b.N)
+	for i := 0; i < b.N; i++ {
+		tc.Set(intToStr(i), DefaultVal, exp)
+	}
+	PrintMemUsage()
+	runtime.GC()
+	fmt.Println("GC took: ", timeGC())
 }
 
 func BenchmarkCacheSetDelete(b *testing.B) {
 	b.StopTimer()
-	tc := New(DTevictionTime)
+	cnf := &Config{
+		SweepTime: DTevictionTime,
+		ShardSize: 256,
+	}
+	tc, err := New(cnf)
+	if err != nil {
+		b.Error(err)
+		return
+	}
+
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		tc.Set("foo", DefaultVal, NoExpiration)
@@ -171,7 +250,15 @@ func BenchmarkCacheSetDelete(b *testing.B) {
 
 func BenchmarkCacheFlush(b *testing.B) {
 	b.StopTimer()
-	tc := New(DTevictionTime)
+	cnf := &Config{
+		SweepTime: DTevictionTime,
+		ShardSize: 256,
+	}
+	tc, err := New(cnf)
+	if err != nil {
+		b.Error(err)
+		return
+	}
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		tc.Set("foo", DefaultVal, NoExpiration)
@@ -181,7 +268,15 @@ func BenchmarkCacheFlush(b *testing.B) {
 
 func BenchmarkCacheMultipleSetFlush(b *testing.B) {
 	b.StopTimer()
-	tc := New(DTevictionTime)
+	cnf := &Config{
+		SweepTime: DTevictionTime,
+		ShardSize: 256,
+	}
+	tc, err := New(cnf)
+	if err != nil {
+		b.Error(err)
+		return
+	}
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		tc.Set(intToStr(i), DefaultVal, NoExpiration)

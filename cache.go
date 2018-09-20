@@ -1,19 +1,48 @@
 package zizou
 
 import (
+	"errors"
 	"time"
 )
 
-func New(sweepTime time.Duration) *Cache {
+var (
+	ERR_INVALID_CONFIG = errors.New("invalid configuration")
+)
+
+func isPowerOfTwo(num uint64) bool {
+	return (num != 0) && ((num & (num - 1)) == 0)
+}
+
+type Config struct {
+	SweepTime time.Duration
+	ShardSize uint64
+}
+
+func (c *Config) Validate() bool {
+	if c.SweepTime < 0 {
+		return false
+	}
+	if !isPowerOfTwo(c.ShardSize) {
+		return false
+	}
+	return true
+}
+
+func New(cnf *Config) (*Cache, error) {
+	isValid := cnf.Validate()
+	if !isValid {
+		return nil, ERR_INVALID_CONFIG
+	}
+
 	nc := &Cache{
-		shards:    make([]*shard, 256),
+		shards:    make([]*shard, cnf.ShardSize),
 		hash:      newXXHash(),
-		shardMask: 255,
+		shardMask: cnf.ShardSize - 1,
 	}
-	for i := uint64(0); i < 256; i++ {
-		nc.shards[i] = newShardWithSweeper(sweepTime)
+	for i := uint64(0); i < cnf.ShardSize; i++ {
+		nc.shards[i] = newShardWithSweeper(cnf.SweepTime)
 	}
-	return nc
+	return nc, nil
 }
 
 type Cache struct {
