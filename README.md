@@ -16,7 +16,11 @@ In memory cache implementation with high concurrency
 ## Example Usage
 
 ```go
-cache:=zizou.New(10*time.Minute)
+config:=zizou.Config{
+	SweepTime:10*time.Minute,
+	ShardSize: 256,
+}
+cache,err:=zizou.New(&config)
 cache.Set("foo", "bar", 10*time.Second)
 item, found := cache.Get("foo")
 ```
