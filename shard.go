@@ -88,7 +88,11 @@ type xxHash struct {
 }
 
 func (x xxHash) Sum64(data string) uint64 {
-	return hash1.Sum64([]byte(data))
+	h := hash1.New()
+	h.Write([]byte(data))
+	r := h.Sum64()
+	h.Reset()
+	return r
 }
 
 func newShard() *shard {
